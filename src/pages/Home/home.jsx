@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import './home.css';
 
 function App() {
@@ -15,13 +16,18 @@ function App() {
         <div className="logo">JobPortal</div>
 
         <div className={`nav-links ${isMenuOpen ? 'active' : ''}`}>
-          <a href="/">Home</a>
+          <a style={{color:"#00bfff"}} href="/">Home</a>
           {/* <a href="/about">About</a>
           <a href="/blog">Blog</a>
           <a href="/contact">Contact</a> */}
           <div className="auth-buttons">
-            <button className="login-btn">Login</button>
-            <button className="signup-btn">Sign Up</button>
+          <Link to="/signin" className="login-btn">
+    Sign In
+  </Link>
+  
+  <Link to="/signup" className="signup-btn">
+    Sign Up
+  </Link>
           </div>
         </div>
 
