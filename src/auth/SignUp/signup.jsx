@@ -9,7 +9,6 @@ import {
   browserPopupRedirectResolver, 
   onAuthStateChanged, 
   updateProfile, 
-  signOut
 } from "firebase/auth";
 import '../Styles/style.css';
 
@@ -20,8 +19,6 @@ function Signup() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
-  const location = useLocation();
-
   // Check if user is already logged in
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './home.css';
 
-function App() {
+function Home() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -51,7 +51,7 @@ function App() {
   );
 }
 
-export default App;
+export default Home;
 //   );
 // }
 

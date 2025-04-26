@@ -3,7 +3,7 @@ import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { auth } from '../config/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
-const privateRoute = () => {
+const PrivateRoute = () => {
   const [authState, setAuthState] = useState({
     isAuthenticated: false,
     isLoading: true,
@@ -38,4 +38,4 @@ const privateRoute = () => {
     <Navigate to="/signin" state={{ from: location.pathname }} replace />;
 };
 
-export default privateRoute;
+export default PrivateRoute;

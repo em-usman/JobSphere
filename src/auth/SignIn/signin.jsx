@@ -104,9 +104,9 @@ function Signin() {
 
           <button type="submit" className="signin-btn" disabled={emailLoading}>{emailLoading ? 'Signing in...' : 'Sign In'}</button>
 
-          <div className="forgot-password">
+          {/* <div className="forgot-password">
             <a href="/forgot-password">Forgot your password?</a>
-          </div>
+          </div> */}
 
           <div className="create-account">
             <span>Don't have an account? </span>
