@@ -1,10 +1,10 @@
 import React from 'react'
 import './postjob.css'
 
-function  Postjob() {
+function Postjob() {
   return (
     <div className='postjob'>Postjob Page</div>
   )
 }
 
-export default  Postjob
+export default Postjob
