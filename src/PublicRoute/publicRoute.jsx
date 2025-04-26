@@ -3,7 +3,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { auth } from '../config/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
-const publicRoute = ({ restricted = false }) => {
+const PublicRoute = ({ restricted = false }) => {
   const [authState, setAuthState] = useState({
     isAuthenticated: false,
     isLoading: true,
@@ -42,4 +42,4 @@ const publicRoute = ({ restricted = false }) => {
   return <Outlet />;
 };
 
-export default publicRoute;
+export default PublicRoute;
