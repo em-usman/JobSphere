@@ -1,6 +1,293 @@
-.mypost {
-    padding-top: 100px;
+/* userPosts.css */
+.user-posts-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    padding-top: 60px;
+  }
+  
+  .user-posts-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 32px;
+    text-align: center;
+    position: relative;
+  }
+  
+  .user-posts-title:after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background-color: #007bff;
+  }
+  
+  .no-posts-message {
+    text-align: center;
+    padding: 40px 0;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    color: #6c757d;
+    font-size: 18px;
+  }
+  
+  .user-posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
+  }
+  
+  .user-post-card {
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  
+  .user-post-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Post Header */
+  .post-header {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .company-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    display: flex;
+    align-items: center;
     justify-content: center;
-    font-size: 3rem;
-}
+    font-size: 28px;
+    font-weight: bold;
+    margin-right: 15px;
+    flex-shrink: 0;
+  }
+  
+  .post-meta {
+    flex-grow: 1;
+  }
+  
+  .post-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 5px 0;
+  }
+  
+  .post-company {
+    font-size: 16px;
+    color: #007bff;
+    margin: 0;
+    font-weight: 500;
+  }
+  
+  /* Post Content */
+  .post-content {
+    padding: 20px;
+    flex-grow: 1;
+  }
+  
+  .post-description {
+    color: #555;
+    font-size: 15px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+  }
+  
+  .post-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed #eee;
+  }
+  
+  .post-location, .post-datetime {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .location-icon, .time-icon {
+    margin-right: 8px;
+    color: #007bff;
+    font-size: 16px;
+  }
+  
+  /* Post Actions */
+  .post-actions {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 20px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #eee;
+  }
+  
+  .edit-btn, .delete-btn {
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+  }
+  
+  .edit-btn {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .edit-btn:hover {
+    background-color: #0069d9;
+  }
+  
+  .delete-btn {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .delete-btn:hover {
+    background-color: #c82333;
+  }
+  
+  /* Edit Form */
+  .edit-form-container {
+    padding: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 15px;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #444;
+  }
+  
+  .form-group input, 
+  .form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .form-group textarea {
+    height: 100px;
+    resize: vertical;
+  }
+  
+  .edit-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .save-btn, .cancel-btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .save-btn {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .save-btn:hover {
+    background-color: #218838;
+  }
+  
+  .cancel-btn {
+    background-color: #6c757d;
+    color: white;
+  }
+  
+  .cancel-btn:hover {
+    background-color: #5a6268;
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 992px) {
+    .user-posts-grid {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .user-posts-grid {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+    
+    .user-posts-title {
+      font-size: 24px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .user-posts-container {
+      padding: 15px;
+      padding-top: 40px;
+    }
+    
+    .user-posts-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .post-header {
+      padding: 15px;
+    }
+    
+    .company-logo {
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+    }
+    
+    .post-title {
+      font-size: 18px;
+    }
+    
+    .post-company {
+      font-size: 14px;
+    }
+    
+    .post-content {
+      padding: 15px;
+    }
+    
+    .post-actions {
+      padding: 12px 15px;
+    }
+    
+    .edit-btn, .delete-btn {
+      padding: 6px 16px;
+      font-size: 14px;
+    }
+  }

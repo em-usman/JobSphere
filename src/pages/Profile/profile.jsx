@@ -3,7 +3,7 @@ import './profile.css'
 
 function Profile() {
   return (
-    <div className='profile'>Profile Page</div>
+    <div className='profile'>Profile Pagenpm run dev</div>
   )
 }
 

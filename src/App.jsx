@@ -8,7 +8,7 @@ import PrivateRoute from './PrivateRoute/privateRoute';
 import PublicRoute from './PublicRoute/publicRoute';
 import Dashboard from './pages/Dashboard/dashboard';
 import MyPosts from './pages/MyPost/myposts';
-import PostJob from './pages/PostJob/postjob';
+import PostJob from './pages/PostJob/postjob'
 import Profile from './pages/Profile/profile' 
 
 
