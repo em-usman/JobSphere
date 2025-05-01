@@ -7,6 +7,7 @@ import {
   serverTimestamp
 } from '../../config/firebase';
 import { auth } from '../../config/firebase';
+import { cloudName } from '../../config/firebase';
 import { useNavigate } from 'react-router-dom';
 
 function PostJob() {
@@ -73,7 +74,6 @@ function PostJob() {
       formData.append('file', file);
       formData.append('upload_preset', 'jobsphere_uploads');
 
-      const cloudName = 'df3y6jl0q';
       const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/${mediaType}/upload`;
 
       const response = await fetch(uploadUrl, {
