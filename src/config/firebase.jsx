@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { getFirestore, collection, addDoc, getDocs, orderBy, query, serverTimestamp } from "firebase/firestore";
 import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
 const firebaseConfig = {
@@ -24,7 +24,7 @@ export const googleProvider = new GoogleAuthProvider();
 
 // Create a Firestore instance
 export const db = getFirestore(app);
-export { collection, addDoc, serverTimestamp };
+export { collection, addDoc, getDocs, orderBy, query, serverTimestamp };
 
 // Create a Storage instance and export storage-related functions
 export const storage = getStorage(app);

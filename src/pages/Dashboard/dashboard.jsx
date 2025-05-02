@@ -1,131 +1,35 @@
 // Dashboard.jsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './dashboard.css';
+import { db, collection, getDocs, query, orderBy } from '../../config/firebase';
 
 function Dashboard() {
-  const jobPosts = [
-    // {
-    //   id: 1,
-    //   createdBy: 'Ali Khan',
-    //   title: 'Frontend Developer',
-    //   company: 'Tech Solutions',
-    //   description: 'We are looking for a passionate React.js developer to join our growing team...',
-    //   email: 'ali@example.com',
-    //   address: 'Lahore, Pakistan',
-    //   imageUrl: '../src/assests/home_bg.jpg',
-    // },
-    {
-      id: 2,
-      createdBy: 'Sara Ahmed',
-      title: 'Backend Engineer',
-      company: 'Innovatech',
-      description: 'Join us as a Node.js backend engineer to build scalable APIs and services...',
-      email: 'sara@example.com',
-      address: 'Karachi, Pakistan',
-      imageUrl: '',
-    },
-    {
-      id: 3,
-      createdBy: 'Ali Khan',
-      title: 'Frontend Developer',
-      company: 'Tech Solutions',
-      description: 'We are looking for a passionate React.js developer to join our growing team...',
-      email: 'ali@example.com',
-      address: 'Lahore, Pakistan',
-      imageUrl: '../../src/assets/home_bg.jpg',
-    },
-    {
-      id: 4,
-      createdBy: 'Ali Khan',
-      title: 'Frontend Developer',
-      company: 'Tech Solutions',
-      description: 'We are looking for a passionate React.js developer to join our growing team...',
-      email: 'ali@example.com',
-      address: 'Lahore, Pakistan',
-      imageUrl: '',
-    },
-    {
-      id: 5,
-      createdBy: 'Sara Ahmed',
-      title: 'Backend Engineer',
-      company: 'Innovatech',
-      description: 'Join us as a Node.js backend engineer to build scalable APIs and services...',
-      email: 'sara@example.com',
-      address: 'Karachi, Pakistan',
-      imageUrl: '',
-    },
-    {
-      id: 6,
-      createdBy: 'Ali Khan',
-      title: 'Frontend Developer',
-      company: 'Tech Solutions',
-      description: 'We are looking for a passionate React.js developer to join our growing team...',
-      email: 'ali@example.com',
-      address: 'Lahore, Pakistan',
-      imageUrl: '../../src/assets/home_bg.jpg',
-    },
-    {
-      id: 7,
-      createdBy: 'Ali Khan',
-      title: 'Frontend Developer',
-      company: 'Tech Solutions',
-      description: 'We are looking for a passionate React.js developer to join our growing team...',
-      email: 'ali@example.com',
-      address: 'Lahore, Pakistan',
-      imageUrl: '',
-    },
-    {
-      id: 8,
-      createdBy: 'Sara Ahmed',
-      title: 'Backend Engineer',
-      company: 'Innovatech',
-      description: 'Join us as a Node.js backend engineer to build scalable APIs and services...',
-      email: 'sara@example.com',
-      address: 'Karachi, Pakistan',
-      imageUrl: '',
-    },
-    {
-      id: 9,
-      createdBy: 'Ali Khan',
-      title: 'Frontend Developer',
-      company: 'Tech Solutions',
-      description: 'We are looking for a passionate React.js developer to join our growing team...',
-      email: 'ali@example.com',
-      address: 'Lahore, Pakistan',
-      imageUrl: '../../src/assets/home_bg.jpg',
-    },
-    {
-      id: 10,
-      createdBy: 'Ali Khan',
-      title: 'Frontend Developer',
-      company: 'Tech Solutions',
-      description: 'We are looking for a passionate React.js developer to join our growing team...',
-      email: 'ali@example.com',
-      address: 'Lahore, Pakistan',
-      imageUrl: '',
-    },
-    {
-      id: 11,
-      createdBy: 'Sara Ahmed',
-      title: 'Backend Engineer',
-      company: 'Innovatech',
-      description: 'Join us as a Node.js backend engineer to build scalable APIs and services...',
-      email: 'sara@example.com',
-      address: 'Karachi, Pakistan',
-      imageUrl: '',
-    },
-    {
-      id: 12,
-      createdBy: 'Ali Khan',
-      title: 'Frontend Developer',
-      company: 'Tech Solutions',
-      description: 'We are looking for a passionate React.js developer to join our growing team...',
-      email: 'ali@example.com',
-      address: 'Lahore, Pakistan',
-      imageUrl: '../../src/assets/home_bg.jpg',
-    }
-    // ... (other jobs same as before)
-  ];
+  const [jobPosts, setJobPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchJobPosts = async () => {
+      try {
+        const q = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+        const jobs = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setJobPosts(jobs);
+      } catch (error) {
+        console.error('Error fetching job posts:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJobPosts();
+  }, []);
+
+  if (loading) {
+    return <div className="loading">Loading job posts...</div>;
+  }
 
   return (
     <div className="job-posts-container">
@@ -142,24 +46,32 @@ function Dashboard() {
 
             {/* Job Image */}
             <div className="job-post-image">
-              {job.imageUrl ? (
-                <img src={job.imageUrl} alt={job.title} />
+              {job.mediaUrl ? (
+                job.mediaType === 'image' ? (
+                  <img src={job.mediaUrl} alt={job.jobTitle} />
+                ) : (
+                  <video src={job.mediaUrl} controls />
+                )
               ) : (
                 <div className="job-post-image-placeholder">
-                  <span>{job.company?.charAt(0) || 'U'}</span>
+                  <span>{job.companyName?.charAt(0) || 'U'}</span>
                 </div>
               )}
             </div>
 
             {/* Job Content */}
             <div className="job-post-content">
-              <h2 className="job-title">{job.title}</h2>
-              <p className="job-company">{job.company}</p>
+              <h2 className="job-title">{job.jobTitle}</h2>
+              <p className="job-company">{job.companyName}</p>
               <div className="job-description">
                 {job.description.length > 100
                   ? `${job.description.substring(0, 100)}...`
                   : job.description}
               </div>
+
+              {/* Salary Info Section */}
+              <div className="salary-info-label">Salary Package</div>
+              <div className="job-salary-amount">{job.salaryPackage}</div>
 
               {/* Contact Info Section */}
               <div className="contact-info-label">Contact Information</div>
