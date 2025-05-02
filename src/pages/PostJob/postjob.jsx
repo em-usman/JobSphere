@@ -187,7 +187,7 @@ function PostJob() {
 
           <div className="form-group">
             <label htmlFor="description">
-              Job Description* <span className="char-count">{charCount}/500</span>
+              Job Description* <span className="char-count">{charCount}/150</span>
             </label>
             <textarea
               id="description"
@@ -195,7 +195,7 @@ function PostJob() {
               value={formData.description}
               onChange={handleChange}
               placeholder="Describe the job role, responsibilities, and requirements..."
-              maxLength="500"
+              maxLength="150"
               required
             ></textarea>
           </div>

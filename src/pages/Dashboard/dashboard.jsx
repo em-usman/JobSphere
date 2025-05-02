@@ -1,34 +1,46 @@
-// Dashboard.jsx
+// src/components/Dashboard.jsx
 import React, { useEffect, useState } from 'react';
 import './dashboard.css';
-import { db, collection, getDocs, query, orderBy } from '../../config/firebase';
+import { db, collection, query, orderBy, onSnapshot } from '../../config/firebase';
 
 function Dashboard() {
   const [jobPosts, setJobPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [newPostAdded, setNewPostAdded] = useState(null);
 
   useEffect(() => {
-    const fetchJobPosts = async () => {
-      try {
-        const q = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
-        const jobs = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setJobPosts(jobs);
-      } catch (error) {
-        console.error('Error fetching job posts:', error);
-      } finally {
-        setLoading(false);
+    const q = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'));
+    
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const jobs = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      
+      // Check if a new post was added (for animation)
+      if (jobPosts.length > 0 && jobs.length > jobPosts.length) {
+        const newPostId = jobs.find(j => !jobPosts.some(p => p.id === j.id))?.id;
+        setNewPostAdded(newPostId);
+        setTimeout(() => setNewPostAdded(null), 1500);
       }
-    };
+      
+      setJobPosts(jobs);
+      setLoading(false);
+    }, (error) => {
+      console.error('Error listening to posts:', error);
+      setLoading(false);
+    });
 
-    fetchJobPosts();
-  }, []);
+    return () => unsubscribe();
+  }, [jobPosts.length]); // Added dependency for new post detection
 
   if (loading) {
-    return <div className="loading">Loading job posts...</div>;
+    return (
+      <div className="loading">
+        <div className="spinner"></div>
+        <p>Loading job posts...</p>
+      </div>
+    );
   }
 
   return (
@@ -37,48 +49,66 @@ function Dashboard() {
 
       <div className="job-posts-grid">
         {jobPosts.map((job) => (
-          <div key={job.id} className="job-post-card">
+          <div 
+            key={job.id} 
+            className={`job-post-card ${newPostAdded === job.id ? 'new-post' : ''}`}
+          >
             {/* Creator info */}
             <div className="creator-info">
-              <div className="creator-avatar">{job.createdBy?.charAt(0)}</div>
-              <span className="creator-name">{job.createdBy}</span>
+              <div className="creator-avatar">
+                {job.createdBy?.charAt(0)?.toUpperCase() || 'U'}
+              </div>
+              <span className="creator-name">
+                {job.createdBy || 'Unknown Creator'}
+              </span>
             </div>
 
-            {/* Job Image */}
+            {/* Job Image/Video */}
             <div className="job-post-image">
               {job.mediaUrl ? (
-                job.mediaType === 'image' ? (
-                  <img src={job.mediaUrl} alt={job.jobTitle} />
-                ) : (
+                job.mediaType === 'video' ? (
                   <video src={job.mediaUrl} controls />
+                ) : (
+                  <img 
+                    src={job.mediaUrl} 
+                    alt={job.jobTitle || 'Job post image'} 
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'fallback-image.jpg';
+                    }}
+                  />
                 )
               ) : (
                 <div className="job-post-image-placeholder">
-                  <span>{job.companyName?.charAt(0) || 'U'}</span>
+                  <span>{job.companyName?.charAt(0)?.toUpperCase() || 'J'}</span>
                 </div>
               )}
             </div>
 
             {/* Job Content */}
             <div className="job-post-content">
-              <h2 className="job-title">{job.jobTitle}</h2>
-              <p className="job-company">{job.companyName}</p>
+              <h2 className="job-title">
+                {job.jobTitle || 'Untitled Position'}
+              </h2>
+              <p className="job-company">
+                {job.companyName || 'Company not specified'}
+              </p>
               <div className="job-description">
-                {job.description.length > 100
-                  ? `${job.description.substring(0, 100)}...`
-                  : job.description}
+                {job.description || 'No description provided.'}
               </div>
 
-              {/* Salary Info Section */}
+              {/* Salary Info */}
               <div className="salary-info-label">Salary Package</div>
-              <div className="job-salary-amount">{job.salaryPackage}</div>
+              <div className="job-salary-amount">
+                {job.salaryPackage || 'Not disclosed'}
+              </div>
 
-              {/* Contact Info Section */}
+              {/* Contact Info */}
               <div className="contact-info-label">Contact Information</div>
               <div className="job-contact-info">
                 <div className="contact-item">
                   <i className="fas fa-envelope"></i>
-                  <span>Email: {job.email}</span>
+                  <span>Email: {job.email || 'Not provided'}</span>
                 </div>
                 {job.address && (
                   <div className="contact-item">
