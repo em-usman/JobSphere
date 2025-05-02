@@ -1,5 +1,6 @@
 /* PostJob.css */
 .post-job-container {
+    margin-top: 50px;
     width: 100%;
     min-height: 100vh;
     background-color: #f5f7fa;
