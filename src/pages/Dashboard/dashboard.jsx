@@ -4,23 +4,27 @@ import './dashboard.css';
 import { db, collection, query, orderBy, onSnapshot } from '../../config/firebase';
 
 function Dashboard() {
-  const [jobPosts, setJobPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [newPostAdded, setNewPostAdded] = useState(null);
+  const [jobPosts, setJobPosts] = useState([]);           // Store job post data
+  const [loading, setLoading] = useState(true);           // Track loading state
+  const [newPostAdded, setNewPostAdded] = useState(null); // Used to highlight a newly added post
 
   useEffect(() => {
+    // Query Firestore collection 'jobs', ordered by creation time (descending)
     const q = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'));
     
+    // Real-time listener to get updates from Firestore
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const jobs = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
       }));
       
-      // Check if a new post was added (for animation)
+      // Detect if a new post was added (compared to existing state)
       if (jobPosts.length > 0 && jobs.length > jobPosts.length) {
         const newPostId = jobs.find(j => !jobPosts.some(p => p.id === j.id))?.id;
         setNewPostAdded(newPostId);
+
+        // Remove highlight after 1.5s
         setTimeout(() => setNewPostAdded(null), 1500);
       }
       
@@ -31,9 +35,12 @@ function Dashboard() {
       setLoading(false);
     });
 
+    // Cleanup on unmount
     return () => unsubscribe();
-  }, [jobPosts.length]); // Added dependency for new post detection
 
+  }, [jobPosts.length]); // Dependency to detect changes in length
+
+  // Show loading spinner while fetching data
   if (loading) {
     return (
       <div className="loading">
@@ -51,9 +58,10 @@ function Dashboard() {
         {jobPosts.map((job) => (
           <div 
             key={job.id} 
-            className={`job-post-card ${newPostAdded === job.id ? 'new-post' : ''}`}
+            className={`job-post-card ${newPostAdded === job.id ? 'new-post' : ''}`} // Add animation class if new
           >
-            {/* Creator info */}
+
+            {/* Creator info section */}
             <div className="creator-info">
               <div className="creator-avatar">
                 {job.createdBy?.charAt(0)?.toUpperCase() || 'U'}
@@ -63,7 +71,7 @@ function Dashboard() {
               </span>
             </div>
 
-            {/* Job Image/Video */}
+            {/* Media section (image or video) */}
             <div className="job-post-image">
               {job.mediaUrl ? (
                 job.mediaType === 'video' ? (
@@ -74,18 +82,19 @@ function Dashboard() {
                     alt={job.jobTitle || 'Job post image'} 
                     onError={(e) => {
                       e.target.onerror = null;
-                      e.target.src = 'fallback-image.jpg';
+                      e.target.src = 'fallback-image.jpg'; // Fallback if image fails
                     }}
                   />
                 )
               ) : (
+                // Placeholder if no media
                 <div className="job-post-image-placeholder">
                   <span>{job.companyName?.charAt(0)?.toUpperCase() || 'J'}</span>
                 </div>
               )}
             </div>
 
-            {/* Job Content */}
+            {/* Job content/details */}
             <div className="job-post-content">
               <h2 className="job-title">
                 {job.jobTitle || 'Untitled Position'}
@@ -118,6 +127,7 @@ function Dashboard() {
                 )}
               </div>
             </div>
+
           </div>
         ))}
       </div>

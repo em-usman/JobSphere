@@ -1,18 +1,29 @@
+// Importing necessary modules and Firebase config
 import React, { useState, useEffect, useRef } from 'react';
+import { toast } from 'react-toastify'; // For showing notifications
+import 'react-toastify/dist/ReactToastify.css';
 import './postjob.css';
 import {
   db,
   collection,
   addDoc,
-  serverTimestamp
+  serverTimestamp,
+  doc,
+  updateDoc
 } from '../../config/firebase';
 import { auth } from '../../config/firebase';
 import { cloudName } from '../../config/firebase';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function PostJob() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const jobToUpdate = location.state?.jobToUpdate;
+  const isUpdateMode = !!jobToUpdate; // Check if in update mode
+
   const fileInputRef = useRef(null);
+
+  // State for job form inputs
   const [formData, setFormData] = useState({
     jobTitle: '',
     companyName: '',
@@ -23,29 +34,58 @@ function PostJob() {
     mediaType: 'image'
   });
 
-  const [file, setFile] = useState(null);
-  const [filePreview, setFilePreview] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [charCount, setCharCount] = useState(0);
-  const [currentUser, setCurrentUser] = useState(null);
+  // Additional states
+  const [file, setFile] = useState(null); // File object
+  const [filePreview, setFilePreview] = useState(null); // For previewing selected file
+  const [isLoading, setIsLoading] = useState(false); // Loading state for submit button
+  const [error, setError] = useState(null); // To store and show form errors
+  const [charCount, setCharCount] = useState(0); // Character count for description
+  const [currentUser, setCurrentUser] = useState(null); // Logged-in user
 
+  // Check user authentication and set default email if not updating
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
       if (user) {
         setCurrentUser(user);
-        setFormData(prev => ({
-          ...prev,
-          email: user.email || ''
-        }));
+
+        // Set user email if creating a new job
+        if (!isUpdateMode) {
+          setFormData(prev => ({
+            ...prev,
+            email: user.email || ''
+          }));
+        }
       } else {
-        navigate('/login');
+        navigate('/login'); // Redirect if not logged in
       }
     });
 
     return () => unsubscribe();
-  }, [navigate]);
+  }, [navigate, isUpdateMode]);
 
+  // Populate form with job data if in update mode
+  useEffect(() => {
+    if (jobToUpdate) {
+      setFormData({
+        jobTitle: jobToUpdate.jobTitle || '',
+        companyName: jobToUpdate.companyName || '',
+        description: jobToUpdate.description || '',
+        email: jobToUpdate.email || '',
+        address: jobToUpdate.address || '',
+        salaryPackage: jobToUpdate.salaryPackage || '',
+        mediaType: jobToUpdate.mediaType || 'image'
+      });
+
+      // Update character count and preview
+      setCharCount(jobToUpdate.description ? jobToUpdate.description.length : 0);
+
+      if (jobToUpdate.mediaUrl) {
+        setFilePreview(jobToUpdate.mediaUrl);
+      }
+    }
+  }, [jobToUpdate]);
+
+  // Handle text inputs and description character count
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -53,11 +93,13 @@ function PostJob() {
       setCharCount(value.length);
     }
 
-    setFormData(prev => {
-      return { ...prev, [name]: value };
-    });
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
+  // Handle file input and preview generation
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
 
@@ -68,6 +110,7 @@ function PostJob() {
     }
   };
 
+  // Upload selected file to Cloudinary
   const uploadToCloudinary = async (file, mediaType) => {
     try {
       const formData = new FormData();
@@ -87,26 +130,29 @@ function PostJob() {
       }
 
       const data = await response.json();
-      return data.secure_url;
+      return data.secure_url; // Return Cloudinary URL
     } catch (error) {
       throw error;
     }
   };
 
+  // Submit handler: creates or updates job post
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       setIsLoading(true);
       setError(null);
-      let mediaUrl = '';
+      let mediaUrl = jobToUpdate?.mediaUrl || '';
 
+      // Upload new file if selected
       if (file) {
         const mediaType = formData.mediaType === 'image' ? 'image' : 'video';
         mediaUrl = await uploadToCloudinary(file, mediaType);
       }
 
-      const docRef = await addDoc(collection(db, 'jobs'), {
+      // Construct job object
+      const jobData = {
         jobTitle: formData.jobTitle,
         companyName: formData.companyName,
         description: formData.description,
@@ -115,13 +161,27 @@ function PostJob() {
         salaryPackage: formData.salaryPackage,
         mediaType: formData.mediaType,
         mediaUrl: mediaUrl,
-        createdAt: serverTimestamp(),
         userId: currentUser.uid,
         createdBy: currentUser.displayName || currentUser.email
-      });
+      };
 
-      console.log('Job post created with ID: ', docRef.id);
+      if (isUpdateMode) {
+        // Update existing job in Firestore
+        const jobRef = doc(db, 'jobs', jobToUpdate.id);
+        await updateDoc(jobRef, {
+          ...jobData,
+          updatedAt: serverTimestamp()
+        });
+        toast.success('Job updated successfully!');
+      } else {
+        // Create new job in Firestore
+        jobData.createdAt = serverTimestamp();
+        const docRef = await addDoc(collection(db, 'jobs'), jobData);
+        console.log('Job post created with ID: ', docRef.id);
+        toast.success('Job posted successfully!');
+      }
 
+      // Reset form after submission
       setFormData({
         jobTitle: '',
         companyName: '',
@@ -136,16 +196,18 @@ function PostJob() {
       setFilePreview(null);
       setCharCount(0);
 
-      alert('Job posted successfully!');
-      navigate('/dashboard');
+      navigate('/dashboard'); // Navigate to dashboard after success
     } catch (err) {
-      console.error('Error posting job: ', err);
-      setError('Failed to post job. Please try again: ' + err.message);
+      console.error(`Error ${isUpdateMode ? 'updating' : 'posting'} job: `, err);
+      setError(`Failed to ${isUpdateMode ? 'update' : 'post'} job. Please try again: ` + err.message);
+      setError(err.message); // Set error message to show in UI
+      toast.error(`Failed to ${isUpdateMode ? 'update' : 'post'} job. Please try again.`);
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Re-enable form
     }
   };
 
+  // Open hidden file input on button click
   const handleBrowseClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -153,9 +215,10 @@ function PostJob() {
   };
 
   return (
+    // JSX rendering form UI
     <div className="post-job-container">
       <div className="post-job-content">
-        <h1 className="post-job-title">Post a New Job</h1>
+        <h1 className="post-job-title">{isUpdateMode ? 'Update Job' : 'Post a New Job'}</h1>
         {error && <div className="error-message">{error}</div>}
 
         <form onSubmit={handleSubmit} className="post-job-form">
@@ -285,7 +348,7 @@ function PostJob() {
               <button type="button" className="file-input-button" onClick={handleBrowseClick}>
                 Browse Files
               </button>
-              <span className="file-name">{file ? file.name : 'No file selected'}</span>
+              <span className="file-name">{file ? file.name : filePreview && !file ? 'Current file' : 'No file selected'}</span>
             </div>
 
             {filePreview && formData.mediaType === 'image' && (
@@ -303,7 +366,7 @@ function PostJob() {
 
           <div className="form-actions">
             <button type="submit" className="submit-button" disabled={isLoading}>
-              {isLoading ? 'Posting...' : 'Post Job'}
+              {isLoading ? (isUpdateMode ? 'Updating...' : 'Posting...') : (isUpdateMode ? 'Update Job' : 'Post Job')}
             </button>
           </div>
         </form>
