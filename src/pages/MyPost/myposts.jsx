@@ -3,93 +3,105 @@ import { db, auth } from '../../config/firebase';
 import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import '../Dashboard/dashboard.css';
 import { useNavigate } from 'react-router-dom';
-import {  toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+/**
+ * MyPosts Component - Displays and manages job posts created by the current user
+ * Features:
+ * - Fetches and displays user-specific job posts
+ * - Allows updating or deleting posts
+ * - Shows loading states and error notifications
+ * - Supports both image and video media types
+ */
 function MyPosts() {
-  // State to store job posts
-  const [jobPosts, setJobPosts] = useState([]);
+  // State management for component data
+  const [jobPosts, setJobPosts] = useState([]); // Array of job posts created by user
+  const [loading, setLoading] = useState(true); // Loading state for data fetching
+  const [currentUser, setCurrentUser] = useState(null); // Currently authenticated user
+  const [newPostAdded, setNewPostAdded] = useState(null); // Tracks newly added posts for highlighting
 
-  // State to manage loading status
-  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate(); // Navigation hook for routing
 
-  // State to store currently authenticated user
-  const [currentUser, setCurrentUser] = useState(null);
-
-  // State to detect and highlight a newly added post
-  const [newPostAdded, setNewPostAdded] = useState(null);
-
-  const navigate = useNavigate();
-
-  // Listen for authentication state changes
+  // Effect to monitor authentication state changes
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(user => {
-      setCurrentUser(user);
+      setCurrentUser(user); // Update current user when auth state changes
     });
-    return () => unsubscribe(); // Clean up the listener on unmount
+    return () => unsubscribe(); // Cleanup: unsubscribe from auth listener on unmount
   }, []);
 
-  // Fetch job posts when the current user changes
+  // Effect to fetch user's job posts when currentUser changes
   useEffect(() => {
     const fetchMyPosts = async () => {
+      // Skip if no authenticated user
       if (!currentUser?.uid) {
         setLoading(false);
         return;
       }
 
-      setLoading(true);
+      setLoading(true); // Activate loading state
       try {
-        // Query posts where userId matches the current user
+        // Create query to get jobs where userId matches current user
         const q = query(
           collection(db, 'jobs'),
           where('userId', '==', currentUser.uid)
         );
+        
+        // Execute query and transform documents
         const querySnapshot = await getDocs(q);
-        const posts = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
+        const posts = querySnapshot.docs.map(doc => ({ 
+          id: doc.id, 
+          ...doc.data() // Spread document data into post object
         }));
 
-        // Highlight a newly added post by comparing previous and current posts
+        // Detect and highlight newly added posts
         if (jobPosts.length > 0 && posts.length > jobPosts.length) {
           const newPostId = posts.find(p => !jobPosts.some(j => j.id === p.id))?.id;
           setNewPostAdded(newPostId);
-          toast.success('New post added!');
-          setTimeout(() => setNewPostAdded(null), 1300); // Remove highlight after 1.5s
+          // Remove highlight after 1.3 seconds
+          setTimeout(() => setNewPostAdded(null), 1300);
         }
 
-        setJobPosts(posts);
+        setJobPosts(posts); // Update job posts state
       } catch (error) {
         console.error('Error fetching posts:', error);
-        toast.error('Failed to fetch job posts.');
+        toast.error('Failed to fetch posts'); // Show error notification
       } finally {
-        setLoading(false);
+        setLoading(false); // Deactivate loading state
       }
     };
 
-    fetchMyPosts();
-  }, [currentUser]);
+    fetchMyPosts(); // Invoke the fetch function
+  }, [currentUser]); // Dependency: runs when currentUser changes
 
-  // Delete a job post
+  /**
+   * Handles deletion of a job post
+   * @param {string} postId - ID of the post to delete
+   */
   const handleDelete = async (postId) => {
+    // Confirm deletion with user
     if (!window.confirm('Are you sure you want to delete this post?')) return;
 
     try {
-      await deleteDoc(doc(db, 'jobs', postId)); // Delete from Firestore
-      setJobPosts(prev => prev.filter(post => post.id !== postId)); // Update state
-      toast.success('Post deleted successfully!'); // Show success message
+      await deleteDoc(doc(db, 'jobs', postId)); // Delete document from Firestore
+      setJobPosts(prev => prev.filter(post => post.id !== postId)); // Update local state
+      toast.success('Post deleted successfully!'); // Show success notification
     } catch (error) {
       console.error('Error deleting post:', error);
-      toast.error('Failed to delete post. Please try again.');
+      toast.error('Failed to delete post'); // Show error notification
     }
   };
 
-  // Navigate to the post job page with the post data for updating
+  /**
+   * Navigates to PostJob component in update mode
+   * @param {object} job - Job post data to update
+   */
   const handleUpdate = (job) => {
     navigate('/postjob', { state: { jobToUpdate: job } });
   };
 
-  // Show loading state while fetching data
+  // Render loading state while fetching data
   if (loading) {
     return (
       <div className="job-posts-container">
@@ -99,31 +111,54 @@ function MyPosts() {
     );
   }
 
+  // Main component render
   return (
     <div className="job-posts-container">
       <h1 className="job-posts-title">MY POSTS</h1>
 
+      {/* Conditional rendering based on posts availability */}
       {jobPosts.length === 0 ? (
         <p>No job posts found.</p>
       ) : (
         <div className="job-posts-grid">
+          {/* Map through job posts and render cards */}
           {jobPosts.map((job) => (
-            // Highlight new post with a class
-            <div key={job.id} className={`job-post-card ${newPostAdded === job.id ? 'new-post' : ''}`}>
+            <div 
+              key={job.id} 
+              // Apply 'new-post' class if this is a newly added post
+              className={`job-post-card ${newPostAdded === job.id ? 'new-post' : ''}`}
+            >
+              {/* Media display section (image/video) */}
               <div className="job-post-image">
                 {job.mediaUrl ? (
                   job.mediaType === 'video' ? (
-                    <video src={job.mediaUrl} controls />
+                    // Video player with controls
+                    <video 
+                      src={job.mediaUrl} 
+                      controls 
+                      playsInline // Required for iOS inline playback
+                      muted={false} // Ensure audio is enabled
+                      preload='metadata' // Load minimal data initially
+                      // Generate thumbnail from video URL
+                      poster={job.mediaUrl.replace(/\.(mp4|mov|webm|mkv)$/, '.jpg')} 
+                    />
                   ) : (
+                    // Image display
                     <img src={job.mediaUrl} alt={job.jobTitle} />
                   )
                 ) : (
-                  <div className="job-post-image-placeholder">
-                    <span>{job.companyName?.charAt(0)?.toUpperCase() || 'J'}</span>
+                  // Placeholder when no media is available
+                  <div className="media-placeholder">
+                    {job.mediaType === 'video' ? (
+                      <i className="fas fa-video"></i>
+                    ) : (
+                      <i className="fas fa-image"></i>
+                    )}
                   </div>
                 )}
               </div>
 
+              {/* Job post content section */}
               <div className="job-post-content">
                 <h2 className="job-title">{job.jobTitle || 'Untitled Position'}</h2>
                 <p className="job-company">{job.companyName || 'Company not specified'}</p>
@@ -131,11 +166,13 @@ function MyPosts() {
                   {job.description || 'No description provided.'}
                 </div>
 
+                {/* Salary information */}
                 <div className="salary-info-label">Salary Package</div>
                 <div className="job-salary-amount">
                   {job.salaryPackage || 'Not specified'}
                 </div>
 
+                {/* Contact information */}
                 <div className="contact-info-label">Contact Information</div>
                 <div className="job-contact-info">
                   <div className="contact-item">
@@ -150,6 +187,7 @@ function MyPosts() {
                   )}
                 </div>
 
+                {/* Action buttons */}
                 <div className="card-buttons">
                   <button 
                     className="update-btn" 
