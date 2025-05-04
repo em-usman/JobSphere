@@ -6,14 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-/**
- * MyPosts Component - Displays and manages job posts created by the current user
- * Features:
- * - Fetches and displays user-specific job posts
- * - Allows updating or deleting posts
- * - Shows loading states and error notifications
- * - Supports both image and video media types
- */
 function MyPosts() {
   // State management for component data
   const [jobPosts, setJobPosts] = useState([]); // Array of job posts created by user

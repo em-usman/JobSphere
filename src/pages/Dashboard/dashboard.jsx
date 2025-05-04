@@ -3,13 +3,6 @@ import React, { useEffect, useState } from 'react';
 import './dashboard.css';
 import { db, collection, query, orderBy, onSnapshot } from '../../config/firebase';
 
-/**
- * Dashboard Component - Displays a list of available job opportunities
- * Features:
- * - Real-time updates from Firestore
- * - Visual indication of new posts
- * - Supports both image and video media types
- */
 function Dashboard() {
   // State to store array of job postings
   const [jobPosts, setJobPosts] = useState([]);
