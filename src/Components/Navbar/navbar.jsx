@@ -121,9 +121,9 @@ function Navbar() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/profile" onClick={() => setIsProfileMenuOpen(false)}>
+                  {/* <Link to="/profile" onClick={() => setIsProfileMenuOpen(false)}>
                     My Profile
-                  </Link>
+                  </Link> */}
                 </li>
                 <li>
                   <Link to="/myposts" onClick={() => setIsProfileMenuOpen(false)}>
