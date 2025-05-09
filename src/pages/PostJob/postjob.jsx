@@ -15,19 +15,6 @@ import { auth } from '../../config/firebase';
 import { cloudName } from '../../config/firebase';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-
-/**
- * This React component provides a full-featured job posting form with both "create" and "update" modes.
- * It handles authenticated access, automatically redirects unauthenticated users to the login page,
- * and populates the form with existing job data if in update mode. It allows users to upload either
- * an image or a video as media using Cloudinary, with validations for file type and size. The form
- * includes fields for job title, company name, description (with a live character counter), email,
- * location, and salary. It supports file previewing and displays inline validation messages.
- * Upon submission, the job is either added to or updated in Firebase Firestore, depending on the mode.
- * Toast notifications provide user feedback throughout the process, and the user is redirected to
- * the dashboard upon successful submission.
- */
-
 function PostJob() {
   // Navigation and location hooks for routing and accessing state
   const navigate = useNavigate();
@@ -130,7 +117,7 @@ function PostJob() {
       : ['video/mp4', 'video/mov', 'video/webm', 'video/mkv'];
 
     // Set max file size (5MB for images, 20MB for videos)
-    const maxSize = formData.mediaType === 'image' ? 5 * 1024 * 1024 : 20 * 1024 * 1024;
+    const maxSize = formData.mediaType === 'image' ? 1 * 1024 * 1024 : 5 * 1024 * 1024;
 
     // Validate file type
     if (!validTypes.includes(selectedFile.type)) {
@@ -140,7 +127,7 @@ function PostJob() {
 
     // Validate file size
     if (selectedFile.size > maxSize) {
-        toast.error(`File too large. Max ${formData.mediaType === 'image' ? '5MB' : '20MB'} allowed.`);
+        toast.error(`File too large. Max ${formData.mediaType === 'image' ? '1MB' : '5MB'} allowed.`);
         return;
     }
 
@@ -373,7 +360,7 @@ function PostJob() {
           <div className="form-group">
             <label htmlFor="mediaFile">
               {formData.mediaType === 'image' 
-                ? 'Upload Company Logo or Job Image' 
+                ? 'Upload Company Logo or Job Image (JPEG, PNG, JPG, or GIF)' 
                 : 'Upload Intro Video (MP4, WebM, MKV, or MOV)'}
             </label>
             <input
