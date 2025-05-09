@@ -1,10 +1,12 @@
-// src/components/Dashboard.jsx
 import React, { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import './dashboard.css';
 import { db, collection, query, orderBy, onSnapshot } from '../../config/firebase';
 
 function Dashboard() {
+  const { searchTerm } = useOutletContext();
   const [jobPosts, setJobPosts] = useState([]);
+  const [filteredJobs, setFilteredJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newPostAdded, setNewPostAdded] = useState(null);
 
@@ -17,7 +19,6 @@ function Dashboard() {
         ...doc.data(),
       }));
       
-      // Check if a new post was added (for animation)
       if (jobPosts.length > 0 && jobs.length > jobPosts.length) {
         const newPostId = jobs.find(j => !jobPosts.some(p => p.id === j.id))?.id;
         setNewPostAdded(newPostId);
@@ -32,7 +33,21 @@ function Dashboard() {
     });
 
     return () => unsubscribe();
-  }, [jobPosts.length]); // Added dependency for new post detection
+  }, [jobPosts.length]);
+
+  useEffect(() => {
+    if (!searchTerm || searchTerm.trim() === '') {
+      setFilteredJobs(jobPosts);
+    } else {
+      const filtered = jobPosts.filter(job => 
+        job.jobTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        job.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        job.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (job.salaryPackage && job.salaryPackage.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+      setFilteredJobs(filtered);
+    }
+  }, [searchTerm, jobPosts]);
 
   if (loading) {
     return (
@@ -44,82 +59,92 @@ function Dashboard() {
   }
 
   return (
-    <div className="job-posts-container">
-      <h1 className="job-posts-title">Available Job Opportunities</h1>
+    <div className="dashboard-container">
+      <div className="job-posts-container">
+        <h1 className="job-posts-title">Available Job Opportunities</h1>
 
-      <div className="job-posts-grid">
-        {jobPosts.map((job) => (
-          <div 
-            key={job.id} 
-            className={`job-post-card ${newPostAdded === job.id ? 'new-post' : ''}`}
-          >
-            {/* Creator info */}
-            <div className="creator-info">
-              <div className="creator-avatar">
-                {job.createdBy?.charAt(0)?.toUpperCase() || 'U'}
-              </div>
-              <span className="creator-name">
-                {job.createdBy || 'Unknown Creator'}
-              </span>
-            </div>
-
-            {/* Job Image/Video */}
-            <div className="job-post-image">
-              {job.mediaUrl ? (
-                job.mediaType === 'video' ? (
-                  <video src={job.mediaUrl} controls />
-                ) : (
-                  <img 
-                    src={job.mediaUrl} 
-                    alt={job.jobTitle || 'Job post image'} 
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = 'fallback-image.jpg';
-                    }}
-                  />
-                )
-              ) : (
-                <div className="job-post-image-placeholder">
-                  <span>{job.companyName?.charAt(0)?.toUpperCase() || 'J'}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Job Content */}
-            <div className="job-post-content">
-              <h2 className="job-title">
-                {job.jobTitle || 'Untitled Position'}
-              </h2>
-              <p className="job-company">
-                {job.companyName || 'Company not specified'}
-              </p>
-              <div className="job-description">
-                {job.description || 'No description provided.'}
-              </div>
-
-              {/* Salary Info */}
-              <div className="salary-info-label">Salary Package</div>
-              <div className="job-salary-amount">
-                {job.salaryPackage || 'Not disclosed'}
-              </div>
-
-              {/* Contact Info */}
-              <div className="contact-info-label">Contact Information</div>
-              <div className="job-contact-info">
-                <div className="contact-item">
-                  <i className="fas fa-envelope"></i>
-                  <span>Email: {job.email || 'Not provided'}</span>
-                </div>
-                {job.address && (
-                  <div className="contact-item">
-                    <i className="fas fa-map-marker-alt"></i>
-                    <span>Address: {job.address}</span>
+        <div className="job-posts-grid">
+          {filteredJobs.length > 0 ? (
+            filteredJobs.map((job) => (
+              <div 
+                key={job.id} 
+                className={`job-post-card ${newPostAdded === job.id ? 'new-post' : ''}`}
+              >
+                <div className="creator-info">
+                  <div className="creator-avatar">
+                    {job.createdBy?.charAt(0)?.toUpperCase() || 'U'}
                   </div>
-                )}
+                  <span className="creator-name">
+                    {job.createdBy || 'Unknown Creator'}
+                  </span>
+                </div>
+
+                <div className={`job-post-image ${job.mediaType === 'video' ? 'has-video' : ''}`}>
+                  {job.mediaUrl ? (
+                    job.mediaType === 'video' ? (
+                      <video 
+                        src={job.mediaUrl} 
+                        controls 
+                        onPlay={(e) => e.target.parentElement.classList.add('playing')}
+                        onPause={(e) => e.target.parentElement.classList.remove('playing')}
+                        aria-label={`Video for ${job.jobTitle} position`}
+                      />
+                    ) : (
+                      <img 
+                        src={job.mediaUrl} 
+                        alt={job.jobTitle || 'Job post image'} 
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'fallback-image.jpg';
+                        }}
+                      />
+                    )
+                  ) : (
+                    <div className="job-post-image-placeholder">
+                      <span>{job.companyName?.charAt(0)?.toUpperCase() || 'J'}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="job-post-content">
+                  <h2 className="job-title">
+                    {job.jobTitle || 'Untitled Position'}
+                  </h2>
+                  <p className="job-company">
+                    {job.companyName || 'Company not specified'}
+                  </p>
+                  <div className="job-description">
+                    {job.description || 'No description provided.'}
+                  </div>
+
+                  <div className="salary-info-label">Salary Package</div>
+                  <div className="job-salary-amount">
+                    {job.salaryPackage || 'Not disclosed'}
+                  </div>
+
+                  <div className="contact-info-label">Contact Information</div>
+                  <div className="job-contact-info">
+                    <div className="contact-item">
+                      <i className="fas fa-envelope"></i>
+                      <span>Email: {job.email || 'Not provided'}</span>
+                    </div>
+                    {job.address && (
+                      <div className="contact-item">
+                        <i className="fas fa-map-marker-alt"></i>
+                        <span>Address: {job.address}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
+            ))
+          ) : (
+            <div className="no-results">
+              <p>No jobs found matching "{searchTerm}"</p>
+              <p className="try-different">Try a different search term</p>
             </div>
-          </div>
-        ))}
+          )}
+        </div>
       </div>
     </div>
   );
