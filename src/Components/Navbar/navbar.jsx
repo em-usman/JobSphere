@@ -160,6 +160,7 @@ function Navbar({ onSearch }) {
                     <li>
                       <button 
                         onClick={handleLogout}
+                        style={{ color: '#dc3545', cursor: 'pointer' }}
                         className="logout-button"
                       >
                         Logout

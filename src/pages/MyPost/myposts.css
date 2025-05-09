@@ -1,4 +1,10 @@
+.job-posts-container {
+  padding-top: 90px;
+}
+
 /* userPosts.css */
+/* ==================== */
+/* USER POSTS PAGE STYLES  */
 .user-posts-container {
     width: 100%;
     max-width: 1200px;
@@ -147,33 +153,46 @@
     background-color: #f8f9fa;
     border-top: 1px solid #eee;
   }
-  
-  .edit-btn, .delete-btn {
-    padding: 8px 20px;
-    border-radius: 6px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: none;
-  }
-  
-  .edit-btn {
-    background-color: #007bff;
-    color: white;
-  }
-  
-  .edit-btn:hover {
-    background-color: #0069d9;
-  }
-  
-  .delete-btn {
-    background-color: #dc3545;
-    color: white;
-  }
-  
-  .delete-btn:hover {
-    background-color: #c82333;
-  }
+  /* ==================== */
+/* BUTTONS & CONTROLS   */
+/* ==================== */
+.card-buttons {
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.update-btn,
+.delete-btn {
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  font-weight: 500;
+}
+
+.update-btn {
+  background-color: #3498db;
+  color: white;
+}
+
+.update-btn:hover {
+  background-color: #2980b9;
+}
+
+.delete-btn {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #c0392b;
+}
+
   
   /* Edit Form */
   .edit-form-container {

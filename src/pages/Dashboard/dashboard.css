@@ -2,7 +2,6 @@
 /* LAYOUT & CONTAINERS  */
 /* ==================== */
 .dashboard-container {
-  padding-top: 80px;
   min-height: 100vh;
 }
 
@@ -165,6 +164,21 @@
 }
 
 /* Video Play Button Overlay */
+/* Video Play Button Overlay */
+/* ==================== */
+/* VIDEO CONTROLS       */
+/* ==================== */
+.job-post-image.has-video {
+  position: relative;
+  cursor: pointer;
+}
+
+.job-post-image.has-video video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .job-post-image.has-video::before {
   content: '';
   position: absolute;
@@ -176,7 +190,7 @@
   background-color: rgba(0, 0, 0, 0.6);
   border-radius: 50%;
   z-index: 1;
-  pointer-events: none;
+  transition: opacity 0.3s ease;
 }
 
 .job-post-image.has-video::after {
@@ -188,14 +202,17 @@
   color: white;
   font-size: 20px;
   z-index: 2;
-  pointer-events: none;
+  transition: opacity 0.3s ease;
 }
 
 .job-post-image.has-video.playing::before,
 .job-post-image.has-video.playing::after {
-  display: none;
+  opacity: 0;
 }
 
+.job-post-image.has-video:hover::before {
+  background-color: rgba(0, 0, 0, 0.8);
+}
 /* Job Content */
 .job-post-content {
   padding: 16px;
@@ -227,45 +244,6 @@
   text-align: center;
 }
 
-/* ==================== */
-/* BUTTONS & CONTROLS   */
-/* ==================== */
-.card-buttons {
-  margin-top: 16px;
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.update-btn,
-.delete-btn {
-  flex: 1;
-  padding: 8px 12px;
-  font-size: 14px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: 0.3s ease;
-  font-weight: 500;
-}
-
-.update-btn {
-  background-color: #3498db;
-  color: white;
-}
-
-.update-btn:hover {
-  background-color: #2980b9;
-}
-
-.delete-btn {
-  background-color: #e74c3c;
-  color: white;
-}
-
-.delete-btn:hover {
-  background-color: #c0392b;
-}
 
 /* ==================== */
 /* STATES & UTILITIES   */
@@ -329,9 +307,6 @@
 /* RESPONSIVE DESIGN    */
 /* ==================== */
 @media (max-width: 768px) {
-  .dashboard-container {
-    padding-top: 70px;
-  }
   
   .job-posts-grid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));

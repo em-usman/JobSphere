@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import './dashboard.css';
 import { db, collection, query, orderBy, onSnapshot } from '../../config/firebase';
@@ -9,6 +9,20 @@ function Dashboard() {
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newPostAdded, setNewPostAdded] = useState(null);
+  const videoRefs = useRef({});
+
+  const togglePlayPause = (jobId) => {
+    const video = videoRefs.current[jobId];
+    if (!video) return;
+
+    if (video.paused) {
+      video.play();
+      video.parentElement.classList.add('playing');
+    } else {
+      video.pause();
+      video.parentElement.classList.remove('playing');
+    }
+  };
 
   useEffect(() => {
     const q = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'));
@@ -65,7 +79,6 @@ function Dashboard() {
   return (
     <div className="dashboard-container">
       <div className="job-posts-container">
-        <h1 className="job-posts-title">Available Job Opportunities</h1>
         <div className="job-posts-grid">
           {filteredJobs.length > 0 ? (
             filteredJobs.map((job) => (
@@ -82,27 +95,40 @@ function Dashboard() {
                   </span>
                 </div>
 
-            {/* Job Image/Video */}
-            <div className="job-post-image">
-              {job.mediaUrl ? (
-                job.mediaType === 'video' ? (
-                  <video src={job.mediaUrl} controls />
-                ) : (
-                  <img 
-                    src={job.mediaUrl} 
-                    alt={job.jobTitle || 'Job post image'} 
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = 'fallback-image.jpg';
-                    }}
-                  />
-                )
-              ) : (
-                <div className="job-post-image-placeholder">
-                  <span>{job.companyName?.charAt(0)?.toUpperCase() || 'J'}</span>
+                {/* Job Image/Video */}
+                <div 
+                  className={`job-post-image ${job.mediaType === 'video' ? 'has-video' : ''}`}
+                  onClick={() => job.mediaType === 'video' && togglePlayPause(job.id)}
+                >
+                  {job.mediaUrl ? (
+                    job.mediaType === 'video' ? (
+                      <video 
+                      controls 
+                      playsInline // Required for iOS inline playback
+                      muted={false} // Ensure audio is enabled
+                      preload='metadata' // Load minimal data initially
+                      // Generate thumbnail from video URL
+                      poster={job.mediaUrl.replace(/\.(mp4|mov|webm|mkv)$/, '.jpg')} 
+                        ref={el => videoRefs.current[job.id] = el}
+                        src={job.mediaUrl}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    ) : (
+                      <img 
+                        src={job.mediaUrl} 
+                        alt={job.jobTitle || 'Job post image'} 
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'fallback-image.jpg';
+                        }}
+                      />
+                    )
+                  ) : (
+                    <div className="job-post-image-placeholder">
+                      <span>{job.companyName?.charAt(0)?.toUpperCase() || 'J'}</span>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
 
                 <div className="job-post-content">
                   <h2 className="job-title">
