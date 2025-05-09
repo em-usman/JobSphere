@@ -13,24 +13,28 @@ function Dashboard() {
   useEffect(() => {
     const q = query(collection(db, 'jobs'), orderBy('createdAt', 'desc'));
     
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const jobs = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      
-      if (jobPosts.length > 0 && jobs.length > jobPosts.length) {
-        const newPostId = jobs.find(j => !jobPosts.some(p => p.id === j.id))?.id;
-        setNewPostAdded(newPostId);
-        setTimeout(() => setNewPostAdded(null), 1500);
+    const unsubscribe = onSnapshot(
+      q,
+      (querySnapshot) => {
+        const jobs = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        
+        if (jobPosts.length > 0 && jobs.length > jobPosts.length) {
+          const newPostId = jobs.find(j => !jobPosts.some(p => p.id === j.id))?.id;
+          setNewPostAdded(newPostId);
+          setTimeout(() => setNewPostAdded(null), 1500);
+        }
+        
+        setJobPosts(jobs);
+        setLoading(false);
+      },
+      (error) => {
+        console.error('Error listening to posts:', error);
+        setLoading(false);
       }
-      
-      setJobPosts(jobs);
-      setLoading(false);
-    }, (error) => {
-      console.error('Error listening to posts:', error);
-      setLoading(false);
-    });
+    );
 
     return () => unsubscribe();
   }, [jobPosts.length]);
@@ -62,7 +66,6 @@ function Dashboard() {
     <div className="dashboard-container">
       <div className="job-posts-container">
         <h1 className="job-posts-title">Available Job Opportunities</h1>
-
         <div className="job-posts-grid">
           {filteredJobs.length > 0 ? (
             filteredJobs.map((job) => (
@@ -79,32 +82,27 @@ function Dashboard() {
                   </span>
                 </div>
 
-                <div className={`job-post-image ${job.mediaType === 'video' ? 'has-video' : ''}`}>
-                  {job.mediaUrl ? (
-                    job.mediaType === 'video' ? (
-                      <video 
-                        src={job.mediaUrl} 
-                        controls 
-                        onPlay={(e) => e.target.parentElement.classList.add('playing')}
-                        onPause={(e) => e.target.parentElement.classList.remove('playing')}
-                        aria-label={`Video for ${job.jobTitle} position`}
-                      />
-                    ) : (
-                      <img 
-                        src={job.mediaUrl} 
-                        alt={job.jobTitle || 'Job post image'} 
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = 'fallback-image.jpg';
-                        }}
-                      />
-                    )
-                  ) : (
-                    <div className="job-post-image-placeholder">
-                      <span>{job.companyName?.charAt(0)?.toUpperCase() || 'J'}</span>
-                    </div>
-                  )}
+            {/* Job Image/Video */}
+            <div className="job-post-image">
+              {job.mediaUrl ? (
+                job.mediaType === 'video' ? (
+                  <video src={job.mediaUrl} controls />
+                ) : (
+                  <img 
+                    src={job.mediaUrl} 
+                    alt={job.jobTitle || 'Job post image'} 
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = 'fallback-image.jpg';
+                    }}
+                  />
+                )
+              ) : (
+                <div className="job-post-image-placeholder">
+                  <span>{job.companyName?.charAt(0)?.toUpperCase() || 'J'}</span>
                 </div>
+              )}
+            </div>
 
                 <div className="job-post-content">
                   <h2 className="job-title">
