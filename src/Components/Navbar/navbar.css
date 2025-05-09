@@ -187,10 +187,6 @@
   background-color: #f5f9ff;
 }
 
-.logout-button {
-  color: #dc3545;
-}
-
 .menu-divider {
   height: 1px;
   background-color: #eee;
@@ -272,9 +268,4 @@
   .mobile-search-popup {
     display: none;
   }
-}
-
-/* Ensure content below navbar is properly positioned */
-body {
-  padding-top: 70px; /* Adjust based on your navbar height */
 }

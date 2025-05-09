@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { db, auth } from '../../config/firebase';
 import { collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
-import '../Dashboard/dashboard.css';
+import './myposts.css'; // Importing CSS for styling
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -97,7 +97,6 @@ function MyPosts() {
   if (loading) {
     return (
       <div className="job-posts-container">
-        <h1 className="job-posts-title">MY POSTS</h1>
         <p>Loading your job posts...</p>
       </div>
     );
@@ -106,8 +105,6 @@ function MyPosts() {
   // Main component render
   return (
     <div className="job-posts-container">
-      <h1 className="job-posts-title">MY POSTS</h1>
-
       {/* Conditional rendering based on posts availability */}
       {jobPosts.length === 0 ? (
         <p>No job posts found.</p>
