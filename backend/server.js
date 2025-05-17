@@ -36,16 +36,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
  * - Logs success or error message
  */
 mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
   serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
   socketTimeoutMS: 45000, // Close sockets after 45s of inactivity
 })
   .then(() => console.log('MongoDB Connected'))
   .catch(err => {
     console.error('MongoDB Connection Error:', err);
-    console.log('Please ensure your MongoDB Atlas connection string is correct');
-    console.log('And that your IP address is whitelisted in the MongoDB Atlas dashboard');
+    // console.log('Please ensure your MongoDB Atlas connection string is correct');
+    // console.log('And that your IP address is whitelisted in the MongoDB Atlas dashboard');
   });
 
 /**
@@ -113,6 +111,7 @@ app.post('/api/contact', async (req, res) => {
  * - Listens on specified PORT
  * - Logs server start message with URL
  */
-app.listen(PORT, '0.0.0.0', () => {
+// add you mongodb ip address in place of 1.2.3.4
+app.listen(PORT, '1.2.3.4', () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
