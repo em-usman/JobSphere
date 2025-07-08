@@ -38,6 +38,10 @@
 
 **[Jobsphere]** is a modern web application designed to connect users with job opportunities through a user-friendly platform. Users can sign up, log in, create and manage job posts, and search for relevant opportunities. The application features a responsive, an integrated contact form, and full CRUD functionality for job posts, leveraging a robust tech stack for seamless performance and scalability.
 
+## Note
+This contact page is build with node, so for now contact page backend is not working as its backend is not deployed, you can it locally on you pc.
+- Also you can create a account with random email to check the working. For google account creation you must need google account.
+
 ## 🛠 Built With <a name="built-with"></a>
 
 ### Tech Stack <a name="tech-stack"></a>
