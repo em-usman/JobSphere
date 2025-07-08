@@ -1,6 +1,7 @@
 // components/Contact/ContactForm.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
+import contactImage from '../../assets/contact_us.jpg';
 import './ContactForm.css';
 
 const ContactForm = () => {
@@ -210,7 +211,7 @@ const ContactForm = () => {
         </div>
         
         <div className="form-image">
-          <img src="../src/assets/contact_us.avif" alt="contact" />
+          <img src={contactImage} alt="contact us" />
         </div>
       </div>
     </div>
