@@ -35,11 +35,13 @@
 <!-- PROJECT DESCRIPTION -->
 
 # 📖 [Jobsphere] <a name="about-project"></a>
+
 **[Jobsphere]** is a modern web application designed to connect users with job opportunities through a user-friendly platform. Users can sign up, log in, create and manage job posts, and search for relevant opportunities. The application features a responsive, an integrated contact form, and full CRUD functionality for job posts, leveraging a robust tech stack for seamless performance and scalability.
 
 ## 🛠 Built With <a name="built-with"></a>
 
 ### Tech Stack <a name="tech-stack"></a>
+
 <details>
   <summary>Client</summary>
   <ul>
@@ -72,6 +74,7 @@
 <!-- Features -->
 
 ### Key Features <a name="key-features"></a>
+
 - **[User Authentication]**
 - **[Post Management]**
 - **[Search Functionality]**
@@ -85,20 +88,20 @@
 
 ## 🚀 Live Demo <a name="live-demo"></a>
 
-> Live demo will be added soon.
-
-<!-- - [Live Demo Link](https://google.com) -->
+- [Live Demo](https://jobspheres-v1.netlify.app/home) **is now available**
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
 
 ## 💻 Getting Started <a name="getting-started"></a>
+
 To get a local copy up and running, follow these steps.
 
 ### Prerequisites
 
 In order to run this project you need:
+
 - Node.js (v16 or higher)
 - npm or yarn
 - Firebase account and project setup
@@ -116,6 +119,7 @@ Example commands:
   cd my-folder
   git clone https://github.com/em-usman/JobSphere.git
 ```
+
 -
 
 ### Install
@@ -128,6 +132,7 @@ Example command:
   cd my-project
   npm install
 ```
+
 -
 
 <!-- ### Usage
@@ -146,31 +151,35 @@ Example command:
 
 To run tests, run the following command:
 
-
 Example command:
 Run the application
+
 ```sh
 npm run dev
 ```
+
 For backend
+
 ```sh
 cd backend
 npm run dev
 ```
+
 -
 
 ### Deployment
 
 You can deploy this project using:
 For frontend
-- netlify 
+
+- netlify
 - vercel
 - github pages
 
 For backend
+
 - heroku
 - railway
-
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -190,6 +199,7 @@ For backend
 <!-- FUTURE FEATURES -->
 
 ## 🔭 Future Features <a name="future-features"></a>
+
 - [ ] **[Real Time Chat System]**
 - [ ] **[Manage and Upload CV]**
 - [ ] **[Manage Profile]**
@@ -209,6 +219,7 @@ Feel free to check the [issues page](https://github.com/em-usman/JobSphere/issue
 <!-- SUPPORT -->
 
 ## ⭐️ Show your support <a name="support"></a>
+
 If you find this project helpful, please consider giving it a ⭐ on GitHub — it helps others discover it too!
 You can also support my work by sharing the repo, opening issues, or contributing code. Every bit of support means a lot!
 
